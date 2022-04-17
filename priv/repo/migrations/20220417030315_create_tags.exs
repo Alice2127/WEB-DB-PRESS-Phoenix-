@@ -3,7 +3,7 @@ defmodule Realworld.Repo.Migrations.CreateTags do
 
   def change do
     create table(:tags) do
-      add :tag, :string, null: false #null: falseを追加
+      add :tag, :string, null: false #null: false を追加
 
       timestamps()
     end

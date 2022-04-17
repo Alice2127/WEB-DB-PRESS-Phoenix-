@@ -18,8 +18,9 @@ defmodule Realworld.Blogs do
       [%Article{}, ...]
 
   """
+
   def list_articles do
-    Repo.all(Article)
+    Repo.all(Article) |> Repo.preload(:tags)
   end
 
   @doc """
@@ -36,7 +37,12 @@ defmodule Realworld.Blogs do
       ** (Ecto.NoResultsError)
 
   """
-  def get_article!(id), do: Repo.get!(Article, id)
+
+
+  def get_article!(id),
+   do: Repo.get!(Article, id) |> Repo.preload(:tags)
+  end
+
 
   @doc """
   Creates a article.
@@ -340,12 +346,4 @@ defmodule Realworld.Blogs do
     article
     |> Article.changeset(attrs, tags)
     |> Repo.insert_or_update()
-  end
-
-  def list_articles do
-    Repo.all(Article) |> Repo.preload(:tags)
-  end
-
-  def get_article!(id),
-   do: Repo.get!(Article, id) |> Repo.preload(:tags)
   end

@@ -23,6 +23,5 @@ defmodule Realworld.Blogs.Tag do
     |> String.split(",")
     |> Enum.map(&String.trim/1)
     |> Enum.reject(&(&1 == ""))
-
   end
 end
