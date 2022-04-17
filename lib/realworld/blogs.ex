@@ -41,7 +41,6 @@ defmodule Realworld.Blogs do
 
   def get_article!(id),
    do: Repo.get!(Article, id) |> Repo.preload(:tags)
-  end
 
 
   @doc """
@@ -347,3 +346,4 @@ defmodule Realworld.Blogs do
     |> Article.changeset(attrs, tags)
     |> Repo.insert_or_update()
   end
+end
