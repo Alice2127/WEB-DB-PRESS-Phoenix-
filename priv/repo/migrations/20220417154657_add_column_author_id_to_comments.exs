@@ -4,8 +4,9 @@ defmodule Realworld.Repo.Migrations.AddColumnAuthorIdToComments do
   def change do
     alter table("comments") do
       add :author_id,
-      references(:users, on_delete: :nothing)
+          references(:users, on_delete: :nothing)
     end
+
     create index(:comments, [:author_id])
   end
 end

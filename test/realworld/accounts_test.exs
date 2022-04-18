@@ -59,13 +59,15 @@ defmodule Realworld.AccountsTest do
     end
 
     test "validates email and password when given" do
-      {:error, changeset} = Accounts.register_user(
-      #not validをinvalidに変更
-      %{email: "not valid", password: "invalid"})
+      {:error, changeset} =
+        Accounts.register_user(
+          # not validをinvalidに変更
+          %{email: "not valid", password: "invalid"}
+        )
 
       assert %{
                email: ["must have the @ sign and no spaces"],
-               #12を8に変更
+               # 12を8に変更
                password: ["should be at least 8 character(s)"]
              } = errors_on(changeset)
     end

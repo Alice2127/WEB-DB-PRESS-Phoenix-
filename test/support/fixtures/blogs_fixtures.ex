@@ -27,13 +27,13 @@ defmodule Realworld.BlogsFixtures do
       attrs
       |> Enum.into(%{
         body: "some body",
-        article_id: Map.get(article_fixture(), :id)})#追加
+        # 追加
+        article_id: Map.get(article_fixture(), :id)
+      })
       |> Realworld.Blogs.create_comment()
 
     comment
   end
-
-
 
   @doc """
   Generate a unique tag tag.

@@ -18,16 +18,22 @@ defmodule Realworld.BlogsTest do
     test "list_articles_by_tag(tag_name)" do
       {:ok, %{article: a1}} =
         Blogs.insert_article_with_tags(%{
-          title: "t", body: "b",
-          tags_string: "Elixir, Phoenix, Nerves, Nx"})
+          title: "t",
+          body: "b",
+          tags_string: "Elixir, Phoenix, Nerves, Nx"
+        })
 
       {:ok, %{article: a2}} =
         Blogs.insert_article_with_tags(%{
-          title: "t", body: "b",
-          tags_string: "Elixir"})
+          title: "t",
+          body: "b",
+          tags_string: "Elixir"
+        })
+
       assert Blogs.list_articles_by_tag("Elixir")
-          |> Enum.map(& &1.id) |> MapSet.new()
-          |> MapSet.equal?(MapSet.new([a1.id, a2.id]))
+             |> Enum.map(& &1.id)
+             |> MapSet.new()
+             |> MapSet.equal?(MapSet.new([a1.id, a2.id]))
     end
 
     test "get_article!/1 returns the article with given id" do
@@ -92,9 +98,8 @@ defmodule Realworld.BlogsTest do
     end
 
     test "create_comment/1 with valid data creates a comment" do
-      valid_attrs = %{body: "some body",
-      article_id: Map.get(article_fixture(), :id)}
-       #追加
+      valid_attrs = %{body: "some body", article_id: Map.get(article_fixture(), :id)}
+      # 追加
 
       assert {:ok, %Comment{} = comment} = Blogs.create_comment(valid_attrs)
       assert comment.body == "some body"

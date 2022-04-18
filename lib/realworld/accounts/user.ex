@@ -47,14 +47,16 @@ defmodule Realworld.Accounts.User do
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
-    #最低12文字を8文字に変更
+    # 最低12文字を8文字に変更
     |> validate_length(:password, min: 8, max: 72)
-    #小文字を最低1つ
+    # 小文字を最低1つ
     |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    #大文字を最低1つ
+    # 大文字を最低1つ
     |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    #数字か記号を最低1つ
-    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    # 数字か記号を最低1つ
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/,
+      message: "at least one digit or punctuation character"
+    )
     |> maybe_hash_password(opts)
   end
 

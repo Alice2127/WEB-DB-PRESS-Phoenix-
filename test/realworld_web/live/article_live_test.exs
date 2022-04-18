@@ -107,4 +107,45 @@ defmodule RealworldWeb.ArticleLiveTest do
       assert html =~ "some updated body"
     end
   end
+
+  defp create_tag(_) do
+    tag = tag_fixture(%{tag: "test"})
+    %(tag: tag)
+  end
+
+  defp create_article_with_tag(_) do
+    {:ok, %{article: article}} =
+      Blogs.insert_article_with_tags(%{
+         title: "some title"
+         body: "some body"
+         author_id: user_fixture().id,
+         tags_string: "test"
+      })
+    %{article_with_tag: tags}
+  end
+
+  setup[
+    :create_article,
+    :create_tag,
+    :create_article_with_tag
+  ]
+
+  test "seaches articles by tag", %{
+    conn: conn,
+    article: article,
+    article_with_tag: article_with_tag
+  } do
+    path = Routes.article_index_path(conn, :index)
+    {:ok, view, _html} = live(conn, path)
+
+    html =
+      view
+      |> element("a[phx-value-tag='test']")
+      |> render_click()
+
+    #選択したタグを持つ記事のみが表示される
+    refute html =~ "/articles/#{article.id}"
+    assert html =~ "/articles/#{article_with_tag.id}"
+  end
+
 end

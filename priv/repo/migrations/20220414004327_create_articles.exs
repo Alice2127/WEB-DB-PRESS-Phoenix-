@@ -10,4 +10,3 @@ defmodule Realworld.Repo.Migrations.CreateArticles do
     end
   end
 end
-
