@@ -2,36 +2,37 @@ defmodule RealworldWeb.ArticleLive.Show do
   use RealworldWeb, :live_view
 
   alias Realworld.Blogs
+
   on_mount{RealworldWeb.CurrentUserAssign, :user}
+
+
+  defp change_comment, do: Blogs.change_comment(%Blogs.Comment{})
+  #ワンライナー(１行)で書ける場合 do: end のendタグは不要,「,」カンマ忘れに注意
+
 
   @impl true
   def mount(_params, _session, socket) do
     {:ok,
-    assign(socket, :comment_changeset, change_comment)}
+    assign(socket, :comment_changeset, change_comment())}
   end
 
-  def handle_event(
-    "post_comment",
-    %{"commnent" => comment_params},
-    socket
-    ) do
+  @impl true
+  def handle_event("post_comment", %{"comment" => comment_params}, socket) do
       case create_comment(comment_params, socket) do
         {:ok, _} ->
-          article =
-            Blogs.get_article!(socket.assigns.article.id)
-            {:noreply,
-          socket
+          article = get_article!(socket.assigns.article.id)
+
+          {:noreply,
+        socket
         |> assign(:article, article)
-        |> assign(:comment_changeset, change_comment)}
-      _ -> {:noreply, socket}
+        |> assign(:comment_changeset, change_comment())}
+
+       {:error, changeset} ->
+          {:noreply, assign(socket, :comment_changeset, changeset)}
     end
   end
 
-  defp change_comment() do
-    Blogs.change_comment(%Blogs.comment{})
-  end
-
-  defp create_comment() do
+  defp create_comment(comment_params, socket) do
     %{
       article: article,
       current_user: user
@@ -72,8 +73,10 @@ end
       current_user: user
     } = socket.assigns
 
-    if article.author_id != user.id do
-      {:noreply, socket}
+    author_id = article.author_id
+
+    if author_id != user.id do
+      {:noreply, put_flash(socket, :error, "You can't delete this article")}
     else
       {:ok, _} = Blogs.delete_article(article)
       redirect_path =
