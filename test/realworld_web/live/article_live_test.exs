@@ -14,7 +14,11 @@ defmodule RealworldWeb.ArticleLiveTest do
   end
 
   describe "Index" do
-    setup [:create_article]
+      setup [
+        :create_article,
+        :create_tag,
+        :create_article_with_tag
+      ]
 
     test "lists all articles", %{conn: conn, article: article} do
       {:ok, _index_live, html} = live(conn, Routes.article_index_path(conn, :index))
@@ -110,25 +114,20 @@ defmodule RealworldWeb.ArticleLiveTest do
 
   defp create_tag(_) do
     tag = tag_fixture(%{tag: "test"})
-    %(tag: tag)
+    %{tag: tag}
   end
 
   defp create_article_with_tag(_) do
     {:ok, %{article: article}} =
-      Blogs.insert_article_with_tags(%{
-         title: "some title"
-         body: "some body"
+      Realworld.Blogs.insert_article_with_tags(%{
+         title: "some title",
+         body: "some body",
          author_id: user_fixture().id,
          tags_string: "test"
       })
-    %{article_with_tag: tags}
+    %{article_with_tag: article}
   end
 
-  setup[
-    :create_article,
-    :create_tag,
-    :create_article_with_tag
-  ]
 
   test "seaches articles by tag", %{
     conn: conn,

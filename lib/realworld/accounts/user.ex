@@ -73,6 +73,8 @@ defmodule Realworld.Accounts.User do
     end
   end
 
+
+
   @doc """
   A user changeset for changing the email.
 
