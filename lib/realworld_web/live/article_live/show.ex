@@ -3,68 +3,42 @@ defmodule RealworldWeb.ArticleLive.Show do
 
   alias Realworld.Blogs
 
-  on_mount{RealworldWeb.CurrentUserAssign, :user}
-
+  on_mount {RealworldWeb.CurrentUserAssign, :user}
 
   defp change_comment, do: Blogs.change_comment(%Blogs.Comment{})
-  #ワンライナー(１行)で書ける場合 do: end のendタグは不要,「,」カンマ忘れに注意
 
+  # ワンライナー(１行)で書ける場合 do: end のendタグは不要,「,」カンマ忘れに注意
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok,
-    assign(socket, :comment_changeset, change_comment())}
-  end
-
-  @impl true
-  def handle_event("post_comment", %{"comment" => comment_params}, socket) do
-      case create_comment(comment_params, socket) do
-        {:ok, _} ->
-          article = get_article!(socket.assigns.article.id)
-
-          {:noreply,
-        socket
-        |> assign(:article, article)
-        |> assign(:comment_changeset, change_comment())}
-
-       {:error, changeset} ->
-          {:noreply, assign(socket, :comment_changeset, changeset)}
-    end
-  end
-
-  defp create_comment(comment_params, socket) do
-    %{
-      article: article,
-      current_user: user
-    } = socket.assigns
-
-    comment_params
-    |> Map.put("article_id", article.id)
-    |> Map.put("author_id", user.id)
-    |> Blogs.create_comment()
+    {:ok, assign(socket, :comment_changeset, change_comment())}
   end
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     article = Blogs.get_article!(id)
-     %{
-      live_action: action,
-      current_user: user,
-     } = socket.assigns
-      author_id = article.author_id
 
-  if action == :edit && author_id != user.id do
-     redirect_path =
-      Routes.article_show_path(socket, :show, article)
-    {:noreply,
-       push_redirect(socket, to: redirect_path)}
-  else
-    {:noreply,
-      socket
-      |> assign(:page_title, page_title(action))
-      |> assign(:article, article)}
- end
-end
+    %{
+      live_action: action,
+      current_user: user
+    } = socket.assigns
+
+    author_id = article.author_id
+
+    if action == :edit && author_id != user.id do
+      redirect_path = Routes.article_show_path(socket, :show, article)
+
+      {:noreply,
+       socket
+       |> put_flash(:error, "You can't edit this article")
+       |> push_redirect(to: redirect_path)}
+    else
+      {:noreply,
+       socket
+       |> assign(:page_title, page_title(action))
+       |> assign(:article, article)}
+    end
+  end
 
   @impl true
   def handle_event("delete", _value, socket) do
@@ -79,11 +53,39 @@ end
       {:noreply, put_flash(socket, :error, "You can't delete this article")}
     else
       {:ok, _} = Blogs.delete_article(article)
-      redirect_path =
-        Routes.article_index_path(socket, :index)
-        {:noreply,
-      push_redirect(socket, to: redirect_path)}
+      redirect_path = Routes.article_index_path(socket, :index)
+      {:noreply, push_redirect(socket, to: redirect_path)}
     end
+  end
+
+  @impl true
+  def handle_event("post_comment", %{"comment" => comment_params}, socket) do
+    case create_comment(comment_params, socket) do
+      {:ok, _} ->
+        article = get_article!(socket.assigns.article.id)
+
+        {:noreply,
+         socket
+         |> assign(:article, article)
+         |> assign(:comment_changeset, change_comment())}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, :comment_changeset, changeset)}
+    end
+  end
+
+  defp get_article!(id), do: Blogs.get_article!(id) |> Realworld.Repo.preload(:comments)
+
+  defp create_comment(comment_params, socket) do
+    %{
+      article: article,
+      current_user: user
+    } = socket.assigns
+
+    comment_params
+    |> Map.put("article_id", article.id)
+    |> Map.put("author_id", user.id)
+    |> Blogs.create_comment()
   end
 
 
