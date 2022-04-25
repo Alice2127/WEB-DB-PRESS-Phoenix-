@@ -3,6 +3,7 @@ defmodule RealworldWeb.ArticleLiveTest do
 
   import Phoenix.LiveViewTest
   import Realworld.BlogsFixtures
+  import Realworld.AccountsFixtures
 
   @create_attrs %{body: "some body", title: "some title"}
   @update_attrs %{body: "some updated body", title: "some updated title"}
